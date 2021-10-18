@@ -4,7 +4,7 @@
 https://www.notion.so/learn2020/Data-Lab-Assignment-b998207345864431b5010549d194416e
 
 # Requirements
-Refer the notion page on the above link.
+Refer the section requirements in notion page https://www.notion.so/learn2020/Data-Lab-Assignment-b998207345864431b5010549d194416e
 
 # Design
 ![](https://github.com/SurendraRedd/Datalab/blob/main/Design-1.jpg)
