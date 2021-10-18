@@ -19,7 +19,7 @@ print('# ' + '=' * 78)
 
 # Required packages importing
 import streamlit as st
-from annotated_text import annotated_text
+#from annotated_text import annotated_text
 import datetime
 import calendar
 from datetime import date
