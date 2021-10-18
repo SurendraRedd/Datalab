@@ -198,7 +198,7 @@ def main():
     This function contains the streamlit code details
     """
     st.markdown(html_temp, unsafe_allow_html=True)
-    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+    #st.markdown(hide_streamlit_style, unsafe_allow_html=True)
     st.image('https://imgd.aeplcdn.com/0x0/cw/static/landing-banners/homepage-d-2021.jpg?v=07072021')
     st.sidebar.info("""
                 ## Packages:
