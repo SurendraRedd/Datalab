@@ -1,3 +1,5 @@
 streamlit
-plotly-express
-streamlit-metrics
+st-card
+streamlit-aggrid
+streamlit-lottie
+requests
