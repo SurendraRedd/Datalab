@@ -4,7 +4,7 @@ new electric car application.
 """
 
 __author__ = 'Surendra Reddy'
-__version__ = '1.0'
+__version__ = '2.0'
 __maintainer__ = 'Surendra Reddy'
 __email__ = 'surendraelectronics@gmail.com'
 __status__ = 'Prototype'
@@ -20,12 +20,19 @@ print('# ' + '=' * 78)
 # Required packages importing
 import streamlit as st
 #from annotated_text import annotated_text
+#from streamlit_metrics import metric, metric_row
+from st_card import st_card
+from st_aggrid import AgGrid,GridUpdateMode
+from st_aggrid.grid_options_builder import GridOptionsBuilder
+from streamlit_lottie import st_lottie
+
 import datetime
 import calendar
 from datetime import date
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import requests
 
 # Database Creation & Connection
 import sqlite3
@@ -84,6 +91,26 @@ def check_hashes(password,hashed_text):
     if make_hashes(password) == hashed_text:
         return hashed_text
     return False
+
+# Ag-Grid Implementation
+def grid_table(df):
+    gb = GridOptionsBuilder.from_dataframe(df)
+    gb.configure_pagination(enabled=True)
+    gb.configure_side_bar()
+    gb.configure_selection('multiple', use_checkbox=True, groupSelectsChildren=True, groupSelectsFiltered=True)
+    gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, editable=True)
+    gridOptions = gb.build()
+    grid_response = AgGrid(df, 
+                gridOptions = gridOptions, 
+                enable_enterprise_modules = True,
+                fit_columns_on_grid_load = False,
+                width='100%',
+                theme = "dark",
+                update_mode = GridUpdateMode.SELECTION_CHANGED,
+                allow_unsafe_jscode=True)
+    df = grid_response['data']
+    selected_rows = grid_response["selected_rows"]
+    return df,selected_rows
 
 # """
 # check_same_thread = False is added to avoid same thread issue
@@ -188,9 +215,12 @@ def fetchFriday():
         else:
             month = 1
             year += 1
-        
-        
 
+def load_lottieurl(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
 
 # main function
 def main():
@@ -202,10 +232,17 @@ def main():
     st.image('https://imgd.aeplcdn.com/0x0/cw/static/landing-banners/homepage-d-2021.jpg?v=07072021')
     st.sidebar.info("""
                 ## Packages:
-                **Streamlit**
-                - How to install? 
-                > 1. **pip install streamlit**
+                **Streamlit, st-card, streamlit-aggrid, streamlit-lottie, requests**
+                - Installation: 
+                - **pip install -r requirements.txt**
                 """)
+    url = "https://assets7.lottiefiles.com/private_files/lf30_mn61zlcj.json"
+    lottie_url = url
+    lottie_json = load_lottieurl(lottie_url)
+    st_cont = st.sidebar.container()
+    #st.sidebar.title("📖 SciLit ")
+    with st_cont:
+        st_lottie(lottie_json,height =100,width =200)
 
     # Add a selectbox to the sidebar:
     add_selectbox = st.sidebar.selectbox(
@@ -255,7 +292,9 @@ def main():
         
         username = st.sidebar.text_input("Username","")
         password = st.sidebar.text_input("Password",type='password')
-
+        # Create card details table
+        create_cardetailstable(conn)
+        
         if st.sidebar.checkbox("Login"):
             hashed_pswd = make_hashes(password)
             result = login_user(conn,username,check_hashes(password,hashed_pswd))
@@ -264,9 +303,6 @@ def main():
                 st.subheader('')
                 st.subheader('')
                 st.subheader('')
-
-                create_cardetailstable(conn)
-
                 
                 with st.expander('Electric Car Booking'):
                     st.subheader("Please fill the below form 👇")
@@ -368,29 +404,103 @@ def main():
                     results= pd.DataFrame.from_records(data = query.fetchall(), columns = cols)
                     #st.dataframe(results)
 
-                    fig = go.Figure(data=[go.Table(
-                        columnwidth =[2,1,1,1,1,1,1,1],
-                        header=dict(values=list(results.columns),
-                                    fill_color='#FD8E72',
-                                    align='center'),
-                        cells=dict(values=[results.username, results.battery, results.model, results.tyre, results.basecost, results.totalcost, results.purchase,results.purchaseday],
-                                fill_color='#E5ECF6',
-                                align='left'))
-])                  
-                    fig.update_layout(margin=dict(l=5,r=5,b=10,t=10),
-                    paper_bgcolor='#F5F5F5')
+                    # fig = go.Figure(data=[go.Table(
+                    #     columnwidth =[2,1,1,1,1,1,1,1],
+                    #     header=dict(values=list(results.columns),
+                    #                 fill_color='#FD8E72',
+                    #                 align='center'),
+                    #     cells=dict(values=[results.username, results.battery, results.model, results.tyre, results.basecost, results.totalcost, results.purchase,results.purchaseday],
+                    #             fill_color='#E5ECF6',
+                    #             align='left'))
+                    # ])                  
+                    # fig.update_layout(margin=dict(l=5,r=5,b=10,t=10),
+                    # paper_bgcolor='#F5F5F5')
 
-                    st.write(fig)
+                    # st.write(fig)
 
-                    labels = [results.columns[2],results.columns[1],results.columns[3]]
-                    values = [results.model,results.battery, results.tyre]
+                    # labels = [results.columns[2],results.columns[1],results.columns[3]]
+                    # values = [results.model,results.battery, results.tyre]
 
-                    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
-                    st.write(fig)
-                     
+                    # fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+                    # st.write(fig)
 
-                               
-                                
+                    #AgGrid(results)
+                    res,sel = grid_table(results)
+
+                st.header('')
+                with st.expander('✨Metrics'):
+                    # Metric Details
+                    dat = sqlite3.connect(URI_SQLITE_DB)
+                    query = dat.execute("SELECT count(*) From cardetailstable")
+                    data = query.fetchall()
+                    #st.metric(label="Current🚗Bookings", value=data[0][0], delta=1)
+                    
+                    #Battery
+                    query40 = dat.execute("select count(*) FROM cardetailstable where battery='40kph'")
+                    data40 = query40.fetchall()
+                    query60 = dat.execute("select count(*) FROM cardetailstable where battery='60kph'")
+                    data60 = query60.fetchall()
+                    query80 = dat.execute("select count(*) FROM cardetailstable where battery='80kph'")
+                    data80 = query80.fetchall()
+
+                    # Wheels
+                    querym1 = dat.execute("select count(*) FROM cardetailstable where model='model1'")
+                    datam1 = querym1.fetchall()
+                    querym2 = dat.execute("select count(*) FROM cardetailstable where model='model2'")
+                    datam2 = querym2.fetchall()
+                    querym3 = dat.execute("select count(*) FROM cardetailstable where model='model3'")
+                    datam3 = querym3.fetchall()     
+
+                    # Tyre
+                    queryt1 = dat.execute("select count(*) FROM cardetailstable where tyre='Eco'")
+                    datat1 = queryt1.fetchall()
+                    queryt2 = dat.execute("select count(*) FROM cardetailstable where tyre='Performance'")
+                    datat2 = queryt2.fetchall()
+                    queryt3 = dat.execute("select count(*) FROM cardetailstable where tyre='Racing'")
+                    datat3 = queryt3.fetchall()                  
+
+                    #st.write("## Here's a single figure")
+                    #metric("🚗Bookings", data[0][0])
+                    st.write("")
+                    st.write("")
+
+                    st_card('🚗Bookings', value=data[0][0], delta=1)
+
+                    st.markdown("## Car Specification Details")
+                    st.write("")
+                    st.write("")
+
+                    first_kpi, second_kpi, third_kpi = st.columns(3)
+
+                    with first_kpi:
+                        st.markdown("**🔋Battery**")
+                        st.markdown(f"<h3 style='text-align: left; color: green;'>40kph: {data40[0][0]}</h3>", unsafe_allow_html=True)
+                        st.markdown(f"<h3 style='text-align: left; color: green;'>60kph: {data60[0][0]}</h3>", unsafe_allow_html=True)
+                        st.markdown(f"<h3 style='text-align: left; color: green;'>80kph: {data80[0][0]}</h3>", unsafe_allow_html=True)
+
+                    with second_kpi:
+                        st.markdown("**🎡Wheel**")
+                        st.markdown(f"<h3 style='text-align: left; color: blue;'>Model1: {datam1[0][0]}</h3>", unsafe_allow_html=True)
+                        st.markdown(f"<h3 style='text-align: left; color: blue;'>Model2: {datam2[0][0]}</h3>", unsafe_allow_html=True)
+                        st.markdown(f"<h3 style='text-align: left; color: blue;'>Model3: {datam3[0][0]}</h3>", unsafe_allow_html=True)
+
+                    with third_kpi:
+                        st.markdown("**☸Tyre**")
+                        st.markdown(f"<h3 style='text-align: left; color: grey;'>Eco: {datat1[0][0]}</h3>", unsafe_allow_html=True)
+                        st.markdown(f"<h3 style='text-align: left; color: grey;'>Performance: {datat2[0][0]}</h3>", unsafe_allow_html=True)
+                        st.markdown(f"<h3 style='text-align: left; color: grey;'>Racing: {datat3[0][0]}</h3>", unsafe_allow_html=True)
+
+                    # metric_row(
+                    #     {
+                    #         "🔋40Battery": data40[0][0],
+                    #         "🔋60Battery": data60[0][0],
+                    #         "🔋80Battery": data80[0][0],
+                    #         "🎡Model1": datam1[0][0],
+                    #         "🎡Model2": datam2[0][0],
+                    #         "🎡Model3": datam3[0][0],                
+                    #     }
+                    # )                               
+                                    
             else:
                 st.warning("Incorrect Userid/Password")
 
