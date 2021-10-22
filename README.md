@@ -1,5 +1,8 @@
 ![visitors](https://visitor-badge.deta.dev/badge?page_id=SurendraRedd.Datalab&left_color=red&right_color=green)
 
+# Application
+https://share.streamlit.io/surendraredd/datalab/main/app.py
+
 # Notion page
 https://www.notion.so/learn2020/Data-Lab-Assignment-b998207345864431b5010549d194416e
 
