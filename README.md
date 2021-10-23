@@ -29,3 +29,6 @@ https://share.streamlit.io/surendraredd/datalab/main/app.py
 
 # Chat on Gitter
 [![Gitter](https://badges.gitter.im/Datalabassignment/community.svg)](https://gitter.im/Datalabassignment/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
+<a href="https://www.buymeacoffee.com/surendra1985" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
