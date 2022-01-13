@@ -1,5 +1,5 @@
 streamlit
-st-card
 streamlit-aggrid
 streamlit-lottie
 requests
+plotly
