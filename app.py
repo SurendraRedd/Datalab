@@ -21,7 +21,7 @@ print('# ' + '=' * 78)
 import streamlit as st
 #from annotated_text import annotated_text
 #from streamlit_metrics import metric, metric_row
-from st_card import st_card
+#from st_card import st_card
 from st_aggrid import AgGrid,GridUpdateMode
 from st_aggrid.grid_options_builder import GridOptionsBuilder
 from streamlit_lottie import st_lottie
@@ -464,7 +464,7 @@ def main():
                     st.write("")
                     st.write("")
 
-                    st_card('🚗Bookings', value=data[0][0], delta=1)
+                    #st_card('🚗Bookings', value=data[0][0], delta=1)
 
                     st.markdown("## Car Specification Details")
                     st.write("")
