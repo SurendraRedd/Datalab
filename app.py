@@ -3,6 +3,7 @@ This application contains the code related to the
 new electric car application.
 """
 
+
 __author__ = 'Surendra Reddy'
 __version__ = '2.0'
 __maintainer__ = 'Surendra Reddy'
@@ -10,11 +11,11 @@ __email__ = 'surendraelectronics@gmail.com'
 __status__ = 'Prototype'
 
 print('# ' + '=' * 78)
-print('Author: ' + __author__)
-print('Version: ' + __version__)
-print('Maintainer: ' + __maintainer__)
-print('Email: ' + __email__)
-print('Status: ' + __status__)
+print(f'Author: {__author__}')
+print(f'Version: {__version__}')
+print(f'Maintainer: {__maintainer__}')
+print(f'Email: {__email__}')
+print(f'Status: {__status__}')
 print('# ' + '=' * 78)
 
 # Required packages importing
@@ -88,9 +89,7 @@ def make_hashes(password):
     return hashlib.sha256(str.encode(password)).hexdigest()
 
 def check_hashes(password,hashed_text):
-    if make_hashes(password) == hashed_text:
-        return hashed_text
-    return False
+    return hashed_text if make_hashes(password) == hashed_text else False
 
 # Ag-Grid Implementation
 def grid_table(df):
@@ -175,13 +174,11 @@ def login_user(conn: Connection,username,password):
         [type]: data from tabke
     """
     c.execute('SELECT * FROM userstable WHERE username =? AND password = ?',(username,password))
-    data = c.fetchall()
-    return data
+    return c.fetchall()
 
 def view_all_items(conn: Connection):
     c.execute('SELECT * FROM cardetailstable')
-    data = c.fetchall()
-    return data
+    return c.fetchall()
 
 
 # css function
@@ -218,9 +215,7 @@ def fetchFriday():
 
 def load_lottieurl(url: str):
     r = requests.get(url)
-    if r.status_code != 200:
-        return None
-    return r.json()
+    return None if r.status_code != 200 else r.json()
 
 # main function
 def main():
